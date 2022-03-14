@@ -25,6 +25,7 @@ import com.amplifyframework.core.model.ModelAssociation;
 import com.amplifyframework.core.model.ModelField;
 import com.amplifyframework.core.model.ModelSchema;
 import com.amplifyframework.core.model.PrimaryKey;
+import com.amplifyframework.core.model.annotations.HasMany;
 import com.amplifyframework.datastore.DataStoreException;
 import com.amplifyframework.datastore.storage.sqlite.SQLiteDataType;
 import com.amplifyframework.datastore.storage.sqlite.TypeConverter;
@@ -83,21 +84,21 @@ public final class SQLiteTable {
         Map<String, SQLiteColumn> sqlColumns = new TreeMap<>();
         for (ModelField modelField : modelSchema.getFields().values()) {
             final ModelAssociation association = associations.get(modelField.getName());
-            final boolean isAssociated = association != null;
+            final boolean associationIsBelongsTo = association != null && association.isOwner();
             // Skip if the field represents an association
             // and is NOT the foreign key
-            if (isAssociated && !association.isOwner()) {
+            /*if (isAssociated && !association.isOwner()) {
                 continue;
-            }
+            }*/
 
             // All associated fields are also foreign keys at this point
             SQLiteColumn column = SQLiteColumn.builder()
-                    .name(isAssociated
+                    .name(associationIsBelongsTo
                             ? association.getTargetName()
                             : modelField.getName())
                     .fieldName(modelField.getName())
                     .tableName(modelSchema.getName())
-                    .ownerOf(isAssociated
+                    .ownerOf(association != null
                             ? association.getAssociatedType()
                             : null)
                     .isNonNull(modelField.isRequired())

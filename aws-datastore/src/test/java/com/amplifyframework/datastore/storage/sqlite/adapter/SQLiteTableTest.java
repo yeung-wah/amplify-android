@@ -38,6 +38,9 @@ public class SQLiteTableTest {
     public void createSQLiteTableForPost() throws AmplifyException {
         ModelSchema schema = ModelSchema.fromModelClass(Post.class);
         Map<String, SQLiteColumn> columns = new HashMap<>();
+        
+        // TODO : add the additional expected columns
+        
         columns.put("id", SQLiteColumn.builder()
                 .name("id")
                 .fieldName("id")
