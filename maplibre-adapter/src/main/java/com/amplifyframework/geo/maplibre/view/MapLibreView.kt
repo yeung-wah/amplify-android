@@ -33,6 +33,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 
 
 typealias MapLibreOptions = com.mapbox.mapboxsdk.maps.MapboxMapOptions
@@ -154,7 +155,12 @@ class MapLibreView
                         BitmapFactory.decodeResource(resources, defaultPlaceActiveIcon)
                     )
                 }
-                this.symbolManager = SymbolManager(this, map, it, null, null).apply {
+                /*this.symbolManager = SymbolManager(this, map, it, null, null).apply {
+                    iconAllowOverlap = true
+                    iconIgnorePlacement = true
+                }*/
+                val geoJsonClusterOptions = GeoJsonOptions().withCluster(true).withClusterMaxZoom(14).withClusterRadius(50)
+                this.symbolManager = SymbolManager(this, map, it, null, geoJsonClusterOptions).apply {
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
                 }

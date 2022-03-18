@@ -137,6 +137,10 @@ subprojects { project ->
 }
 
 private void configureAndroidLibrary(Project project) {
+    if (project.name.contains('geo-clustering-app')) {
+        return
+    }
+    
     project.ext.VERSION_NAME = project.hasProperty('VERSION_NAME') ?
         project.findProperty('VERSION_NAME') :
         rootProject.findProperty('VERSION_NAME')
