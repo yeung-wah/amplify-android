@@ -39,8 +39,6 @@ public class SQLiteTableTest {
         ModelSchema schema = ModelSchema.fromModelClass(Post.class);
         Map<String, SQLiteColumn> columns = new HashMap<>();
         
-        // TODO : add the additional expected columns
-        
         columns.put("id", SQLiteColumn.builder()
                 .name("id")
                 .fieldName("id")
@@ -62,6 +60,22 @@ public class SQLiteTableTest {
                 .isNonNull(false)
                 .tableName("Post")
                 .ownerOf("Blog")
+                .build());
+        columns.put("comments", SQLiteColumn.builder()
+                .name("comments")
+                .fieldName("comments")
+                .dataType(SQLiteDataType.TEXT)
+                .isNonNull(false)
+                .tableName("Post")
+                .ownerOf("Comment")
+                .build());
+        columns.put("authors", SQLiteColumn.builder()
+                .name("authors")
+                .fieldName("authors")
+                .dataType(SQLiteDataType.TEXT)
+                .isNonNull(false)
+                .tableName("Post")
+                .ownerOf("PostAuthorJoin")
                 .build());
         columns.put("status", SQLiteColumn.builder()
                 .name("status")
