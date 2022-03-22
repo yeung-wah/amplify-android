@@ -18,9 +18,11 @@ package com.amplifyframework.geo.maplibre.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
 import androidx.annotation.UiThread
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.amplifyframework.core.Amplify
@@ -33,7 +35,12 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.layers.CircleLayer
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 
 typealias MapLibreOptions = com.mapbox.mapboxsdk.maps.MapboxMapOptions
@@ -163,6 +170,34 @@ class MapLibreView
                 this.symbolManager = SymbolManager(this, map, it, null, geoJsonClusterOptions).apply {
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
+                }
+
+                val geoJsonSources = it.sources.filterIsInstance<GeoJsonSource>()
+                val geoJsonSourceId = geoJsonSources[0].id
+                val clusterCircleLayer = CircleLayer("cluster-circles", geoJsonSourceId)
+                clusterCircleLayer.setProperties(
+                    PropertyFactory.circleColor(
+                        ContextCompat.getColor(
+                            context,
+                            com.mapbox.mapboxsdk.R.color.mapbox_blue
+                        )
+                    ),
+                    PropertyFactory.circleRadius(18f)
+                )
+                clusterCircleLayer.setFilter(Expression.has("point_count"))
+
+                val clusterNumberLayer = SymbolLayer("cluster-numbers", geoJsonSourceId)
+                clusterNumberLayer.setProperties(
+                    PropertyFactory.textField(Expression.toString(Expression.get("point_count"))),
+                    PropertyFactory.textSize(12f),
+                    PropertyFactory.textFont(arrayOf("Arial Bold")),
+                    PropertyFactory.textColor(Color.WHITE),
+                    PropertyFactory.textIgnorePlacement(true),
+                    PropertyFactory.textAllowOverlap(true)
+                )
+                it.apply {
+                    addLayer(clusterCircleLayer)
+                    addLayer(clusterNumberLayer)
                 }
 
                 callback.onStyleLoaded(it)

@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             { Log.e("Testing", "Failed to search for $searchQuery", it) }
         )*/
 
-        Log.i("Testing", "About to get map style sources.")
+        /*Log.i("Testing", "About to get map style sources.")
         mapLibreView.getStyle { _, mapStyle ->
             val geoJsonSources = mapStyle.sources.filterIsInstance<GeoJsonSource>()
             if (geoJsonSources.isEmpty()) {
@@ -140,6 +140,6 @@ class MainActivity : AppCompatActivity() {
                 mapStyle.addLayer(clusterCircleLayer)
                 mapStyle.addLayer(clusterNumberLayer)
             }
-        }
+        }*/
     }
 }
