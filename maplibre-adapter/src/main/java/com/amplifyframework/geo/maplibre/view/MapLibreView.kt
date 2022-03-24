@@ -169,7 +169,8 @@ class MapLibreView
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
                 }*/
-                val geoJsonClusterOptions = GeoJsonOptions().withCluster(true).withClusterMaxZoom(13).withClusterRadius(75)
+                val clusterMaxZoom = 13
+                val geoJsonClusterOptions = GeoJsonOptions().withCluster(true).withClusterMaxZoom(clusterMaxZoom).withClusterRadius(75)
                 this.symbolManager = SymbolManager(this, map, it, null, geoJsonClusterOptions).apply {
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
@@ -178,14 +179,24 @@ class MapLibreView
                 val geoJsonSources = it.sources.filterIsInstance<GeoJsonSource>()
                 val geoJsonSourceId = geoJsonSources[0].id
                 val clusterCircleLayer = CircleLayer("cluster-circles", geoJsonSourceId)
+                // TODO : fix circle radius steps
+                /*val circleRadiusExpression = Expression.interpolate(Expression.exponential(10), Expression.zoom(),
+                    Expression.stop(clusterMaxZoom + 2, 5),
+                    Expression.stop(clusterMaxZoom + 4, 50),
+                    Expression.stop(clusterMaxZoom + 6, 20),
+                    Expression.stop(clusterMaxZoom + 8, 30),
+                    Expression.stop(clusterMaxZoom + 9, 70))*/
+                /*val circleRadiusExpression = Expression.interpolate(Expression.exponential(10), Expression.zoom(),
+                    Expression.stop(clusterMaxZoom + 2, 5), Expression.stop(clusterMaxZoom + 4, 70))
+                    // Expression.stop(5, 10), Expression.stop(12, 60))*/
+                val circleColorStops = arrayOf(Expression.stop(15, Expression.rgb(0, 255, 0)),
+                    Expression.stop(30, Expression.rgb(255, 0, 0)))
+                val circleColorExpression = Expression.step(Expression.get("point_count"),
+                    Expression.rgb(0, 0, 255), *circleColorStops)
                 clusterCircleLayer.setProperties(
-                    PropertyFactory.circleColor(
-                        ContextCompat.getColor(
-                            context,
-                            com.mapbox.mapboxsdk.R.color.mapbox_blue
-                        )
-                    ),
+                    PropertyFactory.circleColor(circleColorExpression),
                     PropertyFactory.circleRadius(18f)
+                    // PropertyFactory.circleRadius(circleRadiusExpression)
                 )
                 clusterCircleLayer.setFilter(Expression.has("point_count"))
 
