@@ -31,6 +31,7 @@ import com.amplifyframework.geo.maplibre.AmplifyMapLibreAdapter
 import com.amplifyframework.geo.maplibre.R
 import com.amplifyframework.geo.maplibre.view.support.AttributionInfoView
 import com.amplifyframework.geo.models.MapStyle
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener
@@ -42,6 +43,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import java.lang.Double.min
 
 
 typealias MapLibreOptions = com.mapbox.mapboxsdk.maps.MapboxMapOptions
@@ -201,13 +203,15 @@ class MapLibreView
                 }
                 
                 map.addOnMapClickListener(OnMapClickListener {  latLngPoint ->
-                    val pointf = map.projection.toScreenLocation(latLngPoint)
-                    val features = map.queryRenderedFeatures(pointf,"cluster-circles")
+                    val pointClicked = map.projection.toScreenLocation(latLngPoint)
+                    val features = map.queryRenderedFeatures(pointClicked,"cluster-circles")
                     if (features.isNotEmpty()) {
                         val cluster = features[0]
                         val numPoints = cluster.getProperty("point_count")
                         log.info("Number of points in cluster: $numPoints")
-                        // TODO : zoom in on this cluster
+                        // Center the cluster that was clicked within the map view and zoom in
+                        val zoomLevel = min(map.maxZoomLevel, map.cameraPosition.zoom + 1)
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngPoint, zoomLevel))
                     }
                     true
                 })
