@@ -41,9 +41,9 @@ class MainActivity : AppCompatActivity() {
     
     private fun signUp() {
         val options = AuthSignUpOptions.builder()
-            .userAttribute(AuthUserAttributeKey.email(), "eatoeric@amazon.com")
+            .userAttribute(AuthUserAttributeKey.email(), "email-address")
             .build()
-        Amplify.Auth.signUp("user1", "Password123", options,
+        Amplify.Auth.signUp("username", "Password", options,
             { Log.i("Testing", "Sign up succeeded: $it") },
             { Log.e ("Testing", "Sign up failed", it) }
         )
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun confirmSignUp() {
         Amplify.Auth.confirmSignUp(
-            "user1", "425841",
+            "username", "code received via email",
             { result ->
                 if (result.isSignUpComplete) {
                     Log.i("Testing", "Confirm signUp succeeded")
@@ -64,12 +64,9 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun signIn() {
-        Amplify.Auth.signIn("user1", "Password123",
+        Amplify.Auth.signIn("username", "Password",
             { _ ->
                 Log.i("Testing", "Signed in")
-                /*this.runOnUiThread {
-                    setupMap()
-                }*/
             },
             { Log.e("Testing", "Failed to sign in", it) }
         )
@@ -95,51 +92,5 @@ class MainActivity : AppCompatActivity() {
             )
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(spaceNeedle, 16.0))
         }
-
-        /*amplifyMapView.onPlaceSelect { place, symbol ->
-            // place is an instance of AmazonLocationPlace
-            // symbol is an instance of Symbol from MapLibre
-            Log.i("Testing", "The selected place is ${place.label}")
-            Log.i("Testing", "It is located at ${place.coordinates}")
-        }*/
-
-        /*val searchQuery = "Amazon Go"
-        Amplify.Geo.searchByText(searchQuery,
-            {
-                for (place in it.places) {
-                    Log.i("Testing", place.toString())
-                }
-            },
-            { Log.e("Testing", "Failed to search for $searchQuery", it) }
-        )*/
-
-        /*Log.i("Testing", "About to get map style sources.")
-        mapLibreView.getStyle { _, mapStyle ->
-            val geoJsonSources = mapStyle.sources.filterIsInstance<GeoJsonSource>()
-            if (geoJsonSources.isEmpty()) {
-                Log.i("Testing", "No GeoJson sources found.")
-            } else {
-                Log.i("Testing", "Number of GeoJson sources: ${geoJsonSources.size}")
-                val geoJsonSourceId = geoJsonSources[0].id
-                Log.i("Testing", "GeoJson source ID: $geoJsonSourceId")
-
-                val clusterCircleLayer = CircleLayer("cluster-circles", geoJsonSourceId)
-                clusterCircleLayer.setProperties(circleColor(ContextCompat.getColor(this, com.mapbox.mapboxsdk.R.color.mapbox_blue)),
-                    circleRadius(18f))
-                clusterCircleLayer.setFilter(Expression.has("point_count"))
-
-                val clusterNumberLayer = SymbolLayer("cluster-numbers", geoJsonSourceId)
-                clusterNumberLayer.setProperties(
-                    textField(Expression.toString(Expression.get("point_count"))),
-                    textSize(12f),
-                    textFont(arrayOf("Arial Bold")),
-                    textColor(Color.WHITE),
-                    textIgnorePlacement(true),
-                    textAllowOverlap(true)
-                )
-                mapStyle.addLayer(clusterCircleLayer)
-                mapStyle.addLayer(clusterNumberLayer)
-            }
-        }*/
     }
 }

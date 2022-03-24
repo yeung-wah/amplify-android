@@ -33,6 +33,7 @@ import com.amplifyframework.geo.maplibre.view.support.AttributionInfoView
 import com.amplifyframework.geo.models.MapStyle
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.style.expressions.Expression
@@ -166,7 +167,7 @@ class MapLibreView
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
                 }*/
-                val geoJsonClusterOptions = GeoJsonOptions().withCluster(true).withClusterMaxZoom(14).withClusterRadius(50)
+                val geoJsonClusterOptions = GeoJsonOptions().withCluster(true).withClusterMaxZoom(13).withClusterRadius(75)
                 this.symbolManager = SymbolManager(this, map, it, null, geoJsonClusterOptions).apply {
                     iconAllowOverlap = true
                     iconIgnorePlacement = true
@@ -189,7 +190,6 @@ class MapLibreView
                 val clusterNumberLayer = SymbolLayer("cluster-numbers", geoJsonSourceId)
                 clusterNumberLayer.setProperties(
                     PropertyFactory.textField(Expression.toString(Expression.get("point_count"))),
-                    PropertyFactory.textSize(12f),
                     PropertyFactory.textFont(arrayOf("Arial Bold")),
                     PropertyFactory.textColor(Color.WHITE),
                     PropertyFactory.textIgnorePlacement(true),
@@ -199,6 +199,18 @@ class MapLibreView
                     addLayer(clusterCircleLayer)
                     addLayer(clusterNumberLayer)
                 }
+                
+                map.addOnMapClickListener(OnMapClickListener {  latLngPoint ->
+                    val pointf = map.projection.toScreenLocation(latLngPoint)
+                    val features = map.queryRenderedFeatures(pointf,"cluster-circles")
+                    if (features.isNotEmpty()) {
+                        val cluster = features[0]
+                        val numPoints = cluster.getProperty("point_count")
+                        log.info("Number of points in cluster: $numPoints")
+                        // TODO : zoom in on this cluster
+                    }
+                    true
+                })
 
                 callback.onStyleLoaded(it)
             }
