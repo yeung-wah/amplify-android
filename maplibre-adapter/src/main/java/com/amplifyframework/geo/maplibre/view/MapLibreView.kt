@@ -180,23 +180,25 @@ class MapLibreView
                 val geoJsonSourceId = geoJsonSources[0].id
                 val clusterCircleLayer = CircleLayer("cluster-circles", geoJsonSourceId)
                 // TODO : fix circle radius steps
+                // note: the commented out block below matches what iOS is doing but why are we
+                // adding to clusterMaxZoom (this will cause only the radius for clusterMaxZoom + 2 to be used)
                 /*val circleRadiusExpression = Expression.interpolate(Expression.exponential(10), Expression.zoom(),
                     Expression.stop(clusterMaxZoom + 2, 5),
-                    Expression.stop(clusterMaxZoom + 4, 50),
-                    Expression.stop(clusterMaxZoom + 6, 20),
-                    Expression.stop(clusterMaxZoom + 8, 30),
-                    Expression.stop(clusterMaxZoom + 9, 70))*/
-                /*val circleRadiusExpression = Expression.interpolate(Expression.exponential(10), Expression.zoom(),
-                    Expression.stop(clusterMaxZoom + 2, 5), Expression.stop(clusterMaxZoom + 4, 70))
-                    // Expression.stop(5, 10), Expression.stop(12, 60))*/
+                    Expression.stop(clusterMaxZoom + 4, 30),
+                    Expression.stop(clusterMaxZoom + 6, 40),
+                    Expression.stop(clusterMaxZoom + 8, 50),
+                    Expression.stop(clusterMaxZoom + 9, 60))*/
+                val circleRadiusExpression = Expression.interpolate(Expression.exponential(1.75), Expression.zoom(),
+                    // Expression.stop(clusterMaxZoom + 2, 5), Expression.stop(clusterMaxZoom + 4, 70))
+                    Expression.stop(map.minZoomLevel, 60), Expression.stop(clusterMaxZoom, 20)) // I think this achieves the behavior we want
                 val circleColorStops = arrayOf(Expression.stop(15, Expression.rgb(0, 255, 0)),
                     Expression.stop(30, Expression.rgb(255, 0, 0)))
                 val circleColorExpression = Expression.step(Expression.get("point_count"),
                     Expression.rgb(0, 0, 255), *circleColorStops)
                 clusterCircleLayer.setProperties(
                     PropertyFactory.circleColor(circleColorExpression),
-                    PropertyFactory.circleRadius(18f)
-                    // PropertyFactory.circleRadius(circleRadiusExpression)
+                    // PropertyFactory.circleRadius(18f)
+                    PropertyFactory.circleRadius(circleRadiusExpression)
                 )
                 clusterCircleLayer.setFilter(Expression.has("point_count"))
 
