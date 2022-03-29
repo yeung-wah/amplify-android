@@ -1,11 +1,8 @@
 package com.example.geosampleapp
 
-import android.graphics.Color
-import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.core.Amplify
@@ -15,13 +12,6 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.layers.CircleLayer
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer
-import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.style.sources.VectorSource
 
 class MainActivity : AppCompatActivity() {
 
@@ -91,6 +81,10 @@ class MainActivity : AppCompatActivity() {
                     .withLatLng(spaceNeedle)
             )
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(spaceNeedle, 16.0))
+        }
+        
+        mapLibreView.setClusterBehavior(false) {
+            Log.i("Testing", "Set clustering to false")
         }
     }
 }
