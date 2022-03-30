@@ -1,5 +1,6 @@
 package com.example.geosampleapp
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.geo.maplibre.view.AmplifyMapView
+import com.amplifyframework.geo.maplibre.view.ClusteringOptions
 import com.amplifyframework.geo.maplibre.view.MapLibreView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -83,8 +85,18 @@ class MainActivity : AppCompatActivity() {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(spaceNeedle, 16.0))
         }
         
-        mapLibreView.setClusterBehavior(false) {
-            Log.i("Testing", "Set clustering to false")
+        val clusteringOptions = ClusteringOptions.builder()
+            .maxClusterZoomLevel(13)
+            .clusterRadius(70)
+            .clusterNumberColor(Color.WHITE)
+            .clusterColor(Color.MAGENTA)
+            .clusterColorSteps(mapOf(10 to Color.GREEN, 4 to Color.RED, 30 to Color.YELLOW))
+            .onClusterClicked { _, _ ->
+            Log.i("Testing", "A cluster was clicked.")
+        }.build()
+        
+        mapLibreView.setClusterBehavior(true, clusteringOptions) {
+            Log.i("Testing", "Set clustering to true")
         }
     }
 }
