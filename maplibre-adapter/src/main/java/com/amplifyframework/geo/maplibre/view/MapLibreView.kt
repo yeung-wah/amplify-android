@@ -32,6 +32,7 @@ import com.amplifyframework.geo.models.MapStyle
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.style.expressions.Expression
 import com.mapbox.mapboxsdk.style.layers.CircleLayer
@@ -81,6 +82,7 @@ class MapLibreView
     }
 
     lateinit var symbolManager: SymbolManager
+    internal lateinit var symbolOnClickListener: (Symbol) -> Boolean
 
     var defaultPlaceIcon = R.drawable.place
     var defaultPlaceActiveIcon = R.drawable.place_active
@@ -183,6 +185,10 @@ class MapLibreView
                         iconIgnorePlacement = true
                     }
                 }
+                
+                if (this::symbolOnClickListener.isInitialized) {
+                    this.symbolManager.addClickListener(symbolOnClickListener)
+                }
 
                 callback.onStyleLoaded(it)
             }
@@ -206,8 +212,10 @@ class MapLibreView
     }
     
     private fun removeClusterLayers(style: Style) {
-        style.removeLayer(CLUSTER_CIRCLE_LAYER_ID)
-        style.removeLayer(CLUSTER_NUMBER_LAYER_ID)
+        style.apply {
+            removeLayer(CLUSTER_CIRCLE_LAYER_ID)
+            removeLayer(CLUSTER_NUMBER_LAYER_ID)
+        }
     }
     
     private fun enableClustering(map: MapboxMap, style: Style) {
@@ -266,10 +274,12 @@ class MapLibreView
         map.addOnMapClickListener { latLngPoint ->
             val pointClicked = map.projection.toScreenLocation(latLngPoint)
             val features = map.queryRenderedFeatures(pointClicked, "cluster-circles")
-            if (features.isNotEmpty()) {
+            if (features.isEmpty()) {
+                false
+            } else {
                 clusteringOptions.onClusterClicked(this, features[0])
+                true
             }
-            true
         }
     }
 

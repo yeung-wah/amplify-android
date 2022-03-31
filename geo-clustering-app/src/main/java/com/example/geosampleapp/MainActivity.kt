@@ -9,7 +9,6 @@ import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.geo.maplibre.view.AmplifyMapView
 import com.amplifyframework.geo.maplibre.view.ClusteringOptions
-import com.amplifyframework.geo.maplibre.view.MapLibreView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -98,5 +97,9 @@ class MainActivity : AppCompatActivity() {
         mapLibreView.setClusterBehavior(true, clusteringOptions) {
             Log.i("Testing", "Set clustering to true")
         }
+        
+        /*mapLibreView.setClusterBehavior(false, null) {
+            Log.i("Testing", "Set clustering to false")
+        }*/
     }
 }
