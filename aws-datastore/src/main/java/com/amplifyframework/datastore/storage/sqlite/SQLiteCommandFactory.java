@@ -148,7 +148,7 @@ final class SQLiteCommandFactory implements SQLCommandFactory {
         tableCount.put(tableName, 1);
 
         // Joins the foreign keys
-        recursivelyBuildJoins(table, columns, joinStatement, tableCount, tableName, null);
+        recursivelyBuildJoins(table, columns, joinStatement, tableCount, tableName);
 
         // Convert columns to comma-separated column names
         boolean firstTable = true;
@@ -261,7 +261,6 @@ final class SQLiteCommandFactory implements SQLCommandFactory {
 
         rawQuery.append(";");
         final String queryString = rawQuery.toString();
-        LOG.info("Query string: " + queryString);
         return new SqlCommand(table.getName(), queryString, bindings);
     }
 
@@ -440,17 +439,13 @@ final class SQLiteCommandFactory implements SQLCommandFactory {
      */
     private void recursivelyBuildJoins(SQLiteTable table, Map<String, List<SQLiteColumn>> columns,
                                        StringBuilder joinStatement, Map<String, Integer> tableCount,
-                                       String tableAlias, String parentTableName) {
+                                       String tableAlias) {
         // Joins the foreign keys
         // LEFT JOIN if foreign key is optional, INNER JOIN otherwise.
         final Iterator<SQLiteColumn> foreignKeyIterator = table.getForeignKeys().iterator();
         while (foreignKeyIterator.hasNext()) {
             final SQLiteColumn foreignKey = foreignKeyIterator.next();
             final String ownedTableName = foreignKey.getOwnedType();
-            if (ownedTableName.equals(parentTableName)) {
-                // This foreign key was already processed as part of the parent table.
-                continue;
-            }
             final ModelSchema ownedSchema = schemaRegistry.getModelSchemaForModelClass(ownedTableName);
             final SQLiteTable ownedTable = SQLiteTable.fromSchema(ownedSchema);
             
@@ -461,7 +456,6 @@ final class SQLiteCommandFactory implements SQLCommandFactory {
                 newOwnedTableCount += currentOwnedTableCount == null ? 0 : currentOwnedTableCount;
                 ownedTableAlias += newOwnedTableCount;
             }
-            // TODO : remove column(s) with a type of parentTableName
             tableCount.put(ownedTableName, newOwnedTableCount);
             columns.put(ownedTableAlias, ownedTable.getSortedColumns());
 
@@ -496,7 +490,7 @@ final class SQLiteCommandFactory implements SQLCommandFactory {
             }
 
             // important that this comes last to maintain the order of the joins
-            recursivelyBuildJoins(ownedTable, columns, joinStatement, tableCount, ownedTableAlias, table.getName());
+            recursivelyBuildJoins(ownedTable, columns, joinStatement, tableCount, ownedTableAlias);
         }
     }
 

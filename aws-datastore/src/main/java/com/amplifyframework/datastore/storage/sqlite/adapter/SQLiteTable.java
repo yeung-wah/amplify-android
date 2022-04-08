@@ -83,21 +83,21 @@ public final class SQLiteTable {
         Map<String, SQLiteColumn> sqlColumns = new TreeMap<>();
         for (ModelField modelField : modelSchema.getFields().values()) {
             final ModelAssociation association = associations.get(modelField.getName());
-            final boolean associationIsBelongsTo = association != null && association.isOwner();
+            final boolean isAssociated = association != null;
             // Skip if the field represents an association
             // and is NOT the foreign key
-            /*if (isAssociated && !association.isOwner()) {
+            if (isAssociated && !association.isOwner()) {
                 continue;
-            }*/
+            }
 
             // All associated fields are also foreign keys at this point
             SQLiteColumn column = SQLiteColumn.builder()
-                    .name(associationIsBelongsTo
+                    .name(isAssociated
                             ? association.getTargetName()
                             : modelField.getName())
                     .fieldName(modelField.getName())
                     .tableName(modelSchema.getName())
-                    .ownerOf(association != null
+                    .ownerOf(isAssociated
                             ? association.getAssociatedType()
                             : null)
                     .isNonNull(modelField.isRequired())
