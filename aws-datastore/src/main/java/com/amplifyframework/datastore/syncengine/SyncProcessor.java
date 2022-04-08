@@ -15,6 +15,8 @@
 
 package com.amplifyframework.datastore.syncengine;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 
 import com.amplifyframework.api.ApiException;
@@ -240,13 +242,14 @@ final class SyncProcessor {
                         processor.onComplete();
                     }
                 })
-                // If it's a SerializedModel, add the ModelSchema, since it isn't added during deserialization.
+            // If it's a SerializedModel, add the ModelSchema, since it isn't added during deserialization.
                 .map(paginatedResult -> Flowable.fromIterable(paginatedResult)
-                        .map(modelWithMetadata -> hydrateSchemaIfNeeded(modelWithMetadata, schema))
-                        .toList()
-                        .blockingGet()
-                )
-                .takeUntil(items -> recordsFetched.accumulateAndGet(items.size(), Integer::sum) >= syncMaxRecords);
+                    .map(modelWithMetadata -> hydrateSchemaIfNeeded(modelWithMetadata, schema))
+                    .toList()
+                    .blockingGet()
+            )
+                    .takeUntil(items ->
+                         recordsFetched.getAndSet(items.size()) >= syncMaxRecords);
     }
 
     @SuppressWarnings("unchecked") // Cast to T
