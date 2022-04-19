@@ -258,9 +258,40 @@ public final class SQLiteStorageAdapterQueryTest {
 
         final List<Comment> comments = adapter.query(Comment.class);
         assertTrue(comments.contains(comment));
-        assertEquals(comments.get(0).getPost(), post);
-        assertEquals(comments.get(0).getPost().getBlog(), blog);
-        assertEquals(comments.get(0).getPost().getBlog().getOwner(), blogOwner);
+        assertEquals(post, comments.get(0).getPost());
+        assertEquals(blog, comments.get(0).getPost().getBlog());
+        assertEquals(blogOwner, comments.get(0).getPost().getBlog().getOwner());
+    }
+    
+    // TODO : add a comment here
+    @Test
+    public void querySavedDataWithHasManyAssociation() throws DataStoreException {
+        final BlogOwner blogOwner = BlogOwner.builder()
+                .name("Alan Turing")
+                .build();
+
+        final Blog blog = Blog.builder()
+                .name("Alan's Software Blog")
+                .owner(blogOwner)
+                .build();
+
+        final Post post = Post.builder()
+                .title("Alan's first post")
+                .status(PostStatus.ACTIVE)
+                .rating(2)
+                .blog(blog)
+                .build();
+
+        adapter.save(blogOwner);
+        adapter.save(blog);
+        adapter.save(post);
+
+        final List<Blog> blogs = adapter.query(Blog.class);
+        assertTrue(blogs.contains(blog));
+        final List<Post> posts = blogs.get(0).getPosts();
+        assertNotNull(posts);
+        assertEquals(1, posts.size());
+        assertEquals(post, posts.get(0));
     }
 
     /**
