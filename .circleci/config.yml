@@ -3,6 +3,7 @@
 version: 2.1
 
 orbs:
+  android: circleci/android@2.0.0
   getting-started-smoke-test:
     orbs:
       android: circleci/android@2.0.0
@@ -47,4 +48,4 @@ jobs:
 workflows:
   canaries:
     jobs:
-      - getting-started-smoke-test/android
+      - test
