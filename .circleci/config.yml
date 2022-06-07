@@ -29,11 +29,22 @@ orbs:
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+
+jobs:
+  test:
+    working_directory: ~/android-canaries/canaries/example
+    executor:
+      name: android/android-machine
+      resource-class: xlarge
+      tag: 2022.03.1
+    steps:
+      - checkout:
+          path: ~/android-canaries
+      - run:
+          name: Run tests
+          command: for i in $(seq 1 5); do echo "hello world" && s=0 && break || s=$? && sleep 10; done; (exit $s)
+
 workflows:
   canaries:
-    when:
-      and:
-        - equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
-        - equal: [ "Canaries", << pipeline.schedule.name >> ]
     jobs:
       - getting-started-smoke-test/android
