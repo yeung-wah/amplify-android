@@ -33,6 +33,7 @@ orbs:
                 role-session-name: ${CIRCLE_WORKFLOW_JOB_ID}
                 role-arn: ${AWS_ROLE_ARN}
                 session-duration: '2000'
+          - run: lslrasdt
           - android/create-avd:
               avd-name: myavd
               install: true
