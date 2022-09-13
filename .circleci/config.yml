@@ -13,7 +13,7 @@ orbs:
         description: Send failure datapoint to cloudwatch
         steps:
           - run:
-              name: Send failure datapoint to cloudwatch
+              name: Send failure datapoint to cloudwatch1
               command: |
                 payload="{\"jobName\": \"${CIRCLE_JOB}\", \"projectRepoName\": \"${CIRCLE_PROJECT_REPONAME}\"}"
                 echo $payload
